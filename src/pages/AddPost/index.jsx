@@ -37,12 +37,12 @@ export const AddPost = () => {
   return (
     <Paper style={{ padding: 30 }}>
       <Button variant="outlined" size="large">
-        Загрузить превью
+        Загрузити превью
       </Button>
       <input type="file" onChange={handleChangeFile} hidden />
       {imageUrl && (
         <Button variant="contained" color="error" onClick={onClickRemoveImage}>
-          Удалить
+          Видалити
         </Button>
       )}
       {imageUrl && (
@@ -60,10 +60,10 @@ export const AddPost = () => {
       <SimpleMDE className={styles.editor} value={value} onChange={onChange} options={options} />
       <div className={styles.buttons}>
         <Button size="large" variant="contained">
-          Опубликовать
+          Опубликувати
         </Button>
         <a href="/">
-          <Button size="large">Отмена</Button>
+          <Button size="large">Відміна</Button>
         </a>
       </div>
     </Paper>
