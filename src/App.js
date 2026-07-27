@@ -1,5 +1,5 @@
 import Container from "@mui/material/Container";
-
+import { BrowserRouter } from "react-router-dom";
 import { Header } from "./components";
 import { Home, FullPost, Registration, AddPost, Login } from "./pages";
 
