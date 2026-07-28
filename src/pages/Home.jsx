@@ -9,7 +9,7 @@ import axios from '../axios';
 import { Post } from '../components/Post';
 import { TagsBlock } from '../components/TagsBlock';
 import { CommentsBlock } from '../components/CommentsBlock';
-import { fetchPosts } from '../redux/slices/posts';
+import { fetchPosts, fetchTags } from '../redux/slices/posts';
 
 export const Home = () => {
 
@@ -18,12 +18,12 @@ export const Home = () => {
   const {posts, tags} = useSelector(state => state.posts);
 
   const isPostsLoading = posts.status === 'loading';
+  const isTagsLoading = tags.status === 'loading';
 
   useEffect(()=>{
-    dispatch(fetchPosts())
+    dispatch(fetchPosts());
+    dispatch(fetchTags());
   }, [])
-
-  console.log(posts);
 
   return (
     <>
@@ -39,20 +39,19 @@ export const Home = () => {
             <Post key={index} isLoading={true}/>
           ) : (
             <Post
-              id={1}
-              title="Roast the code #1 | Rock Paper Scissors"
-              imageUrl="https://res.cloudinary.com/practicaldev/image/fetch/s--UnAfrEG8--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png"
-              user={obj.user}
+              id={obj._id}
+              title={obj.title}
+              imageUrl={obj.imageUrl}
               createdAt={obj.createdAt}
               viewsCount={obj.viewsCount}
-              commentsCount={3}
+              commentsCount={obj.commentsCount}
               tags={obj.tags}
               isEditable
             />
           ))}
         </Grid>
         <Grid xs={4} item>
-          <TagsBlock items={['react', 'typescript', 'заметки']} isLoading={false} />
+          <TagsBlock items={tags.items} isLoading={isTagsLoading} />
           <CommentsBlock
             items={[
               {
