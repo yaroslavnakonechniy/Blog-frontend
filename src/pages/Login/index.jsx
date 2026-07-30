@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { fetchAuth, selectIsAuth } from "../../redux/slices/auth";
 import styles from "./Login.module.scss";
@@ -21,16 +21,16 @@ export const Login = () => {
     formState: { errors, isValid },
   } = useForm({
     defaultValues: {
-      email: 'yaroslav99.n@gmail.com',
-      password: 'Yaroslav645868',
+      email: 'qwerty1@gmail.com',
+      password: 'qwerty12345',
     },
     mode: 'onChange',
   });
 
-  const onSubmit = (values) => {
+  const onSubmit =  async(values) => {
     const data = await dispatch(fetchAuth(values));
 
-    if(data.payload) {
+    if(!data.payload) {
       return alert("Не вдалося авторизуватися!");
     }
 
