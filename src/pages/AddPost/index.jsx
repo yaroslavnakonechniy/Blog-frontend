@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import SimpleMDE from 'react-simplemde-editor';
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import 'easymde/dist/easymde.min.css';
@@ -13,9 +13,10 @@ import axios from '../../axios';
 
 export const AddPost = () => {
 
+  const navigate = useNavigate();
   const isAuth = useSelector(selectIsAuth);
   const [isLoading, setIsLoading] = React.useState(false); 
-  const [value, setValue] = React.useState('');
+  const [text, setText] = React.useState('');
   const [title, setTetile] = React.useState('');
   const [tags, setTags] = React.useState('');
   const [imageUrl, setImageUrl] = React.useState('');
@@ -38,8 +39,31 @@ export const AddPost = () => {
   };
 
   const onChange = React.useCallback((value) => {
-    setValue(value);
+    setText(value);
   }, []);
+
+  const onSubmit = async () => {
+    try { 
+      setIsLoading(true);
+
+      const fields = {
+        title,
+        imageUrl,
+        tags,
+        text,
+      };
+
+      const { data } = await axios.post('/posts', fields);
+
+      const id = data._id;
+
+      navigate(`/posts/${id}`);
+
+    } catch (err) {
+      console.warn(err);
+      alert("Помилка при створені статі!");
+    }
+  };
 
   const options = React.useMemo(
     () => ({
@@ -96,9 +120,9 @@ export const AddPost = () => {
         value={tags}
         onChange={(e) => setTags(e.target.value)}
         fullWidth />
-      <SimpleMDE className={styles.editor} value={value} onChange={onChange} options={options} />
+      <SimpleMDE className={styles.editor} value={text} onChange={onChange} options={options} />
       <div className={styles.buttons}>
-        <Button size="large" variant="contained">
+        <Button onClick={onSubmit} size="large" variant="contained">
           Опубликувати
         </Button>
         <a href="/">
