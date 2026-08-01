@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import SimpleMDE from 'react-simplemde-editor';
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import 'easymde/dist/easymde.min.css';
@@ -13,14 +13,17 @@ import axios from '../../axios';
 
 export const AddPost = () => {
 
+  const {id} = useParams();
   const navigate = useNavigate();
   const isAuth = useSelector(selectIsAuth);
   const [isLoading, setIsLoading] = React.useState(false); 
   const [text, setText] = React.useState('');
-  const [title, setTetile] = React.useState('');
+  const [title, setTitle] = React.useState('');
   const [tags, setTags] = React.useState('');
   const [imageUrl, setImageUrl] = React.useState('');
   const inputFileRef = React.useRef(null);
+
+  const isEditing = Boolean(id);
 
   const handleChangeFile = async (event) => {
     try {
@@ -53,17 +56,35 @@ export const AddPost = () => {
         text,
       };
 
-      const { data } = await axios.post('/posts', fields);
+      const { data } = isEditing
+        ? await axios.patch(`/posts/${id}`, fields)
+        : await axios.post('/posts', fields);
 
-      const id = data._id;
+      const _id = isEditing ? id : data._id;
 
-      navigate(`/posts/${id}`);
+      navigate(`/posts/${_id}`);
 
     } catch (err) {
       console.warn(err);
       alert("Помилка при створені статі!");
     }
   };
+
+  React.useEffect(() => {
+    if (!id) return;
+
+    axios.get(`/posts/${id}`)
+      .then(({ data }) => {
+        setTitle(data.title);
+        setText(data.text);
+        setImageUrl(data.imageUrl);
+        setTags(data.tags.join(','));
+      })
+      .catch((err) => {
+        console.warn(err);
+        alert("Помилка при отриманні статті!");
+      });
+  }, [id]);
 
   const options = React.useMemo(
     () => ({
@@ -110,7 +131,7 @@ export const AddPost = () => {
         variant="standard"
         placeholder="Заголовок статьи..."
         value={title}
-        onChange={(e) => setTetile(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
         fullWidth
       />
       <TextField 
@@ -122,8 +143,13 @@ export const AddPost = () => {
         fullWidth />
       <SimpleMDE className={styles.editor} value={text} onChange={onChange} options={options} />
       <div className={styles.buttons}>
-        <Button onClick={onSubmit} size="large" variant="contained">
-          Опубликувати
+        <Button
+          disabled={isLoading}
+          onClick={onSubmit}
+          size="large"
+          variant="contained"
+        >
+          {isEditing ? "Зберегти" : "Створити"}
         </Button>
         <a href="/">
           <Button size="large">Відміна</Button>
